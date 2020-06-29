@@ -10,6 +10,8 @@ Pictures from [James Webb Space Telescope](https://webbtelescope.org/)
 Can be used as idle screen for the mark2
 
 ![](./gui.png)
+![](./gui1.png)
+![](./gui2.png)
 
 ## Examples
 * "picture from james webb telescope"

@@ -50,11 +50,13 @@ class JamesWebbTelescopeSkill(MycroftSkill):
             max_size = 0
             min_size = 99999
             for link in image_data["image_files"]:
+                if not link.get("height") or not link.get("width"):
+                    continue
+                if link['height'] > 2 * link['width'] \
+                        and self.settings["exclude_long"]:
+                    continue  # skip long infographics
                 for ext in [".png", ".jpg", ".jpeg"]:
                     if link["file_url"].endswith(ext):
-                        if link['height'] > 2 * link['width'] \
-                                and self.settings["exclude_long"]:
-                            continue  # skip long infographics
                         if link["width"] > max_size:
                             data["imgLink"] = "http:" + link["file_url"]
                         if max_size < link["width"] < min_size:
