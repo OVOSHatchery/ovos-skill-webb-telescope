@@ -1,0 +1,35 @@
+{
+  "name": "James Webb Space Telescope Skill",
+  "skillname": "skill-webb-telescope",
+  "authorname": "JarbasSkills",
+  "foldername": "",
+  "url": "https://github.com/JarbasSkills/skill-webb-telescope",
+  "branch": "master",
+  "desktopFile": false,
+  "warning": "",
+  "systemDeps": false,
+  "platforms": [
+    "arm",
+    "arm64",
+    "i386",
+    "x86_64",
+    "ia64"
+  ],
+  "examples": [
+    "picture from webb telescope",
+    "explain",
+    "tell me about the webb telescope",
+    "Where is the webb telescope",
+    "what is webb space telescope mission",
+    "why was webb created",
+    "what are webb's instruments",
+    "how does webb work",
+    "did webb find any planets",
+    "can webb take pictures of earth",
+    "can webb see things on the moon",
+    "is webb data public",
+    "Can we see live photos from webb",
+    "Where is webb looking at",
+    "Are the colors in webb images real"
+  ]
+}
