@@ -1,18 +1,20 @@
-from mycroft import intent_file_handler, intent_handler, MycroftSkill
-from mycroft.skills.core import resting_screen_handler
-from adapt.intent import IntentBuilder
-from mtranslate import translate
 import random
-from os.path import join, dirname
-from os import listdir
-from requests_cache import CachedSession
 from datetime import timedelta
-from mycroft.util import create_daemon
+from os import listdir
+from os.path import join, dirname
+
+from ovos_utils import create_daemon
+from ovos_workshop.decorators import intent_handler
+from ovos_workshop.decorators import resting_screen_handler
+from ovos_workshop.intents import IntentBuilder
+from ovos_workshop.skills import OVOSSkill
+from requests_cache import CachedSession
 
 
-class JamesWebbTelescopeSkill(MycroftSkill):
-    def __init__(self):
-        super(JamesWebbTelescopeSkill, self).__init__(name="WebbTelescopeSkill")
+class JamesWebbTelescopeSkill(OVOSSkill):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         if "random" not in self.settings:
             # idle screen, random or latest
             self.settings["random"] = False
@@ -35,17 +37,20 @@ class JamesWebbTelescopeSkill(MycroftSkill):
         for e in entries:
             image_data = self.session.get(
                 info_url.format(img_id=e["id"])).json()
-            if image_data["mission"] != "james_webb" and\
+            if image_data["mission"] != "james_webb" and \
                     not self.settings["include_hubble"]:
                 continue
             data = {
-                "author": "Webb Space Telescope",
-                "caption": image_data.get("description"),
-                "title": image_data["name"],
-                "url": "https://hubblesite.org/image/{id}/gallery".format(
-                    id=e["id"]),
-                "imgLink": "",
-
+                "author":
+                    "Webb Space Telescope",
+                "caption":
+                    image_data.get("description"),
+                "title":
+                    image_data["name"],
+                "url":
+                    "https://hubblesite.org/image/{id}/gallery".format(id=e["id"]),
+                "imgLink":
+                    "",
             }
             max_size = 0
             min_size = 99999
@@ -85,7 +90,7 @@ class JamesWebbTelescopeSkill(MycroftSkill):
         for k in data:
             if not self.lang.startswith("en") and k in tx:
                 if data[k] not in self.translate_cache:
-                    translated = translate(data[k], self.lang)
+                    translated = self.translator.translate(data[k], self.lang)
                     self.translate_cache[data[k]] = translated
                     data[k] = translated
                 else:
@@ -108,15 +113,17 @@ class JamesWebbTelescopeSkill(MycroftSkill):
         pics = listdir(path)
         return join(path, random.choice(pics))
 
-    @intent_file_handler("about.intent")
+    @intent_handler("about.intent")
     def handle_about_webb_intent(self, message):
         webb = self._random_pic()
         caption = self.dialog_renderer.render("about", {})
-        self.gui.show_image(webb, override_idle=True,
-                            fill='PreserveAspectFit', caption=caption)
+        self.gui.show_image(webb,
+                            override_idle=True,
+                            fill='PreserveAspectFit',
+                            caption=caption)
         self.speak(caption, wait=True)
 
-    @intent_file_handler('webb.intent')
+    @intent_handler('webb.intent')
     def handle_pod(self, message):
         if self.voc_match(message.data["utterance"], "latest"):
             self.update_picture(True)
@@ -129,15 +136,13 @@ class JamesWebbTelescopeSkill(MycroftSkill):
 
         self.speak(self.settings['caption'])
 
-    @intent_handler(IntentBuilder("ExplainIntent")
-                    .require("ExplainKeyword").require("WebbTelescope"))
+    @intent_handler(
+        IntentBuilder("ExplainIntent").require("ExplainKeyword").require(
+            "WebbTelescope"))
     def handle_explain(self, message):
-        self.gui.show_image(self.settings['imgLink'], override_idle=True,
+        self.gui.show_image(self.settings['imgLink'],
+                            override_idle=True,
                             fill='PreserveAspectFit',
                             title=self.settings["title"],
                             caption=self.settings['caption'])
         self.speak(self.settings['caption'], wait=True)
-
-
-def create_skill():
-    return JamesWebbTelescopeSkill()
